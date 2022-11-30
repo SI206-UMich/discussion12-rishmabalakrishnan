@@ -55,12 +55,37 @@ def job_and_hire_date(cur, conn):
 def problematic_salary(cur, conn):
     # pass
     cur.execute('SELECT Employees.first_name, Employees.last_name FROM Employees JOIN Jobs ON Employees.job_id = Jobs.job_id WHERE Employees.salary > Jobs.max_salary OR Employees.salary < Jobs.min_salary')
+    conn.commit()
     return cur.fetchall()
 
 # TASK 4: VISUALIZATION
 def visualization_salary_data(cur, conn):
     # pass
-    
+    cur.execute('SELECT Employees.salary, Jobs.job_title FROM Employees JOIN Jobs ON Employees.job_id = Jobs.job_id')
+    salary_job_list = cur.fetchall()
+    job_list = []
+    salary_list = []
+    for item in salary_job_list:
+        job_list.append(item[1])
+        salary_list.append(item[0])
+    plt.figure()
+    plt.scatter(x = job_list, y = salary_list)
+    cur.execute('SELECT min_salary, max_salary, job_title FROM Jobs')
+    salary_job_list = cur.fetchall()
+    job_list = []
+    salary_list = []
+    for item in salary_job_list:
+        # append min
+        job_list.append(item[2])
+        salary_list.append(item[0])
+        # append max
+        job_list.append(item[2])
+        salary_list.append(item[1])
+    plt.scatter(x = job_list, y = salary_list, marker='x', color='red')
+    plt.xticks(rotation = 30)
+    plt.tight_layout()
+    plt.show()
+    conn.commit()
 
 class TestDiscussion12(unittest.TestCase):
     def setUp(self) -> None:
@@ -95,6 +120,8 @@ def main():
 
     wrong_salary = (problematic_salary(cur, conn))
     print(wrong_salary)
+
+    visualization_salary_data(cur, conn)
 
 if __name__ == "__main__":
     main()
